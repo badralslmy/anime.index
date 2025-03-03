@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>موقع الأنمي</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        #search-bar {
+            margin: 20px;
+            padding: 10px;
+            width: 80%;
+            font-size: 18px;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            display: inline-block;
+            width: 80%;
+            text-align: left;
+        }
+        .result img {
+            width: 100px;
+            height: 150px;
+            margin-right: 15px;
+            float: left;
+        }
+        .result a {
+            font-size: 18px;
+            text-decoration: none;
+            color: #333;
+        }
+        .result p {
+            font-size: 16px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>موقع الأنمي</h1>
+        <input type="text" id="search-bar" placeholder="ابحث عن الأنمي..." oninput="searchAnime()">
+    </header>
+
+    <div id="results-container"></div>
+
+    <footer>
+        <p>جميع الحقوق محفوظة &copy; 2025</p>
+    </footer>
+
+    <script>
+        const apiUrl = 'https://anime-proxy-seven.vercel.app/search?q='; // رابط الخادم الذي نشرته على Vercel
+
+        function searchAnime() {
+            const query = document.getElementById('search-bar').value.trim();
+            if (query.length < 3) {
+                // إذا كان النص المدخل أقل من 3 حروف، لا نبحث
+                return;
+            }
+
+            // جلب البيانات من الخادم
+            fetch(apiUrl + query)
+                .then(response => response.json())
+                .then(data => {
+                    displayResults(data); // عرض النتائج في الصفحة
+                })
+                .catch(error => {
+                    console.error('خطأ في جلب البيانات:', error);
+                });
+        }
+
+        function displayResults(data) {
+            const resultsContainer = document.getElementById('results-container');
+            resultsContainer.innerHTML = ''; // مسح النتائج السابقة
+
+            if (data && data.length > 0) {
+                data.forEach(item => {
+                    const resultDiv = document.createElement('div');
+                    resultDiv.classList.add('result');
+
+                    const resultHTML = `
+                        <img src="${item.image}" alt="${item.title}">
+                        <a href="${item.url}" target="_blank">${item.title}</a>
+                        <p>${item.description}</p>
+                    `;
+                    resultDiv.innerHTML = resultHTML;
+                    resultsContainer.appendChild(resultDiv);
+                });
+            } else {
+                resultsContainer.innerHTML = '<p>لم يتم العثور على نتائج.</p>';
+            }
+        }
+    </script>
+</body>
+</html>
